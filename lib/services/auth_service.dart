@@ -1,0 +1,118 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:wellbeingu/models/user_model.dart';
+
+class AuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Get current user
+  User? get currentUser => _auth.currentUser;
+
+  // Stream of auth changes
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Register with email and password
+  Future<UserModel?> registerWithEmailAndPassword(
+    String name, 
+    String email, 
+    String password
+  ) async {
+    try {
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      
+      if (userCredential.user != null) {
+        // Create a user document in Firestore
+        final userModel = UserModel(
+          id: userCredential.user!.uid,
+          name: name,
+          email: email,
+        );
+        
+        await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set(userModel.toMap());
+            
+        return userModel;
+      }
+      return null;
+    } catch (e) {
+      print('Error registering user: $e');
+      rethrow;
+    }
+  }
+
+  // Sign in with email and password
+  Future<UserModel?> signInWithEmailAndPassword(
+    String email, 
+    String password
+  ) async {
+    try {
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      
+      if (userCredential.user != null) {
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+            
+        if (userDoc.exists) {
+          return UserModel.fromMap(
+            {'id': userCredential.user!.uid, ...userDoc.data()!}
+          );
+        }
+      }
+      return null;
+    } catch (e) {
+      print('Error signing in: $e');
+      rethrow;
+    }
+  }
+  
+  // Sign out
+  Future<void> signOut() async {
+    await _auth.signOut();
+  }
+  
+  // Get user data
+  Future<UserModel?> getUserData() async {
+    try {
+      if (currentUser == null) return null;
+      
+      final userDoc = await _firestore
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get();
+          
+      if (userDoc.exists) {
+        return UserModel.fromMap(
+          {'id': currentUser!.uid, ...userDoc.data()!}
+        );
+      }
+      return null;
+    } catch (e) {
+      print('Error getting user data: $e');
+      return null;
+    }
+  }
+  
+  // Update user data
+  Future<void> updateUserData(UserModel userModel) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userModel.id)
+          .update(userModel.toMap());
+    } catch (e) {
+      print('Error updating user data: $e');
+      rethrow;
+    }
+  }
+}
