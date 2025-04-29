@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wellbeingu/models/user_model.dart';
@@ -13,10 +15,8 @@ class AuthService {
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   // Register with email and password
-  Future<UserModel?> registerWithEmailAndPassword(
-    String name, 
-    String email, 
-    String password
+  Future<UserModel?> createUserWithEmailAndPassword(
+   {required String email, required String password,String? name}
   ) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -28,7 +28,7 @@ class AuthService {
         // Create a user document in Firestore
         final userModel = UserModel(
           id: userCredential.user!.uid,
-          name: name,
+          name: name ?? "test",
           email: email,
         );
         
@@ -41,15 +41,14 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print('Error registering user: $e');
+      log('Error registering user: $e');
       rethrow;
     }
   }
 
   // Sign in with email and password
   Future<UserModel?> signInWithEmailAndPassword(
-    String email, 
-    String password
+    {required String email ,required String password}
   ) async {
     try {
       final userCredential = await _auth.signInWithEmailAndPassword(
@@ -71,7 +70,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      print('Error signing in: $e');
+      log('Error signing in: $e');
       rethrow;
     }
   }
@@ -111,7 +110,7 @@ class AuthService {
           .doc(userModel.id)
           .update(userModel.toMap());
     } catch (e) {
-      print('Error updating user data: $e');
+      log('Error updating user data: $e');
       rethrow;
     }
   }
