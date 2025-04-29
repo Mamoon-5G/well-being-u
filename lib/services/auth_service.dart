@@ -15,15 +15,17 @@ class AuthService {
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   // Register with email and password
-  Future<UserModel?> createUserWithEmailAndPassword(
-   {required String email, required String password,String? name}
-  ) async {
+  Future<UserModel?> createUserWithEmailAndPassword({
+    required String email,
+    required String password,
+    String? name,
+  }) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      
+      print("USER" + userCredential.toString());
       if (userCredential.user != null) {
         // Create a user document in Firestore
         final userModel = UserModel(
@@ -31,12 +33,12 @@ class AuthService {
           name: name ?? "test",
           email: email,
         );
-        
+
         await _firestore
             .collection('users')
             .doc(userCredential.user!.uid)
             .set(userModel.toMap());
-            
+
         return userModel;
       }
       return null;
@@ -47,26 +49,35 @@ class AuthService {
   }
 
   // Sign in with email and password
-  Future<UserModel?> signInWithEmailAndPassword(
-    {required String email ,required String password}
-  ) async {
+  Future<UserModel?> signInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      
+      final UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
       if (userCredential.user != null) {
-        final userDoc = await _firestore
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .get();
-            
-        if (userDoc.exists) {
-          return UserModel.fromMap(
-            {'id': userCredential.user!.uid, ...userDoc.data()!}
-          );
-        }
+        // final userDoc =
+        //     await _firestore
+        //         .collection('users')
+        //         .doc(userCredential.user!.uid)
+        //         .get();
+
+        // if (userDoc.exists) {
+        //   return UserModel.fromMap({
+        //     'id': userCredential.user!.uid,
+        //     ...userDoc.data()!,
+        //   });
+        // }
+
+        ///store data in firestore if they register
+        final uid = userCredential.user!.uid;
+        final CollectionReference reference = _firestore.collection('Users');
+        await reference.doc(email.toLowerCase()).set({
+          'email': email.toLowerCase(),
+          'uid': uid,
+        });
       }
       return null;
     } catch (e) {
@@ -74,26 +85,22 @@ class AuthService {
       rethrow;
     }
   }
-  
+
   // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
   }
-  
+
   // Get user data
   Future<UserModel?> getUserData() async {
     try {
       if (currentUser == null) return null;
-      
-      final userDoc = await _firestore
-          .collection('users')
-          .doc(currentUser!.uid)
-          .get();
-          
+
+      final userDoc =
+          await _firestore.collection('users').doc(currentUser!.uid).get();
+
       if (userDoc.exists) {
-        return UserModel.fromMap(
-          {'id': currentUser!.uid, ...userDoc.data()!}
-        );
+        return UserModel.fromMap({'id': currentUser!.uid, ...userDoc.data()!});
       }
       return null;
     } catch (e) {
@@ -101,7 +108,7 @@ class AuthService {
       return null;
     }
   }
-  
+
   // Update user data
   Future<void> updateUserData(UserModel userModel) async {
     try {
