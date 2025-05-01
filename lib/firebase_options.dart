@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'well-being-u.firebasestorage.app',
     measurementId: 'G-TKYK4PPPB5',
   );
+
 }

@@ -161,26 +161,19 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                           
                           // Progress indicator
                           if (isEnrolled && !isCompleted)
-                            CustomCircularProgressIndicator(
-                              progress: progress / 100,
-                              size: 50,
-                              strokeWidth: 8,
-                              backgroundColor: Colors.grey[300]!,
-                              progressColor: AppTheme.primaryColor,
-                              child: Text(
-                                '$progress%',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
+                           Row(children: [
+                            ElevatedButton(onPressed: (){}, child:const  Text('Enrolled')),
+
+                            /// edit this in order to show progress of each code
+
+                            // CustomCircularProgressIndicator(progress: progress/100, size: 10, strokeWidth: 2 ,backgroundColor: Colors.grey.shade300, progressColor: Colors.green, child: Text('progress'),)
+                           ],),
                           
                           // Completed indicator
                           if (isCompleted)
                             Container(
                               padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
+                              decoration:const BoxDecoration(
                                 color: Colors.green,
                                 shape: BoxShape.circle,
                               ),
@@ -296,7 +289,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                                   ? const Icon(Icons.check, color: Colors.white)
                                   : Text(
                                       '${lesson.order + 1}',
-                                      style: TextStyle(
+                                      style:const TextStyle(
                                         color: AppTheme.primaryColor,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -306,7 +299,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                           title: Text(lesson.title),
                           subtitle: Text(
                             'Lesson • ${lesson.pointsReward} points',
-                            style: TextStyle(color: Colors.grey),
+                            style: const  TextStyle(color: Colors.grey),
                           ),
                           trailing: isEnrolled
                               ? const Icon(Icons.arrow_forward_ios, size: 16)
@@ -381,7 +374,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                                 }
                               : null,
                         );
-                      }).toList(),
+                      }),
                       
                       const SizedBox(height: 100), // Space for the button
                     ],
@@ -420,7 +413,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   child: progressProvider.isLoading
-                      ? const CircularProgressIndicator()
+                      ? const CircularProgressIndicator(backgroundColor: Colors.red,)
                       : const Text('Enroll Now'),
                 ),
               ),
