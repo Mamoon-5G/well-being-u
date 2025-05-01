@@ -9,6 +9,7 @@ class UserModel {
   final Map<String, int> progress;
   final List<String> badges;
   final int level;
+  final DateTime createdAt;
 
   UserModel({
     required this.id,
@@ -21,12 +22,13 @@ class UserModel {
     this.progress = const {},
     this.badges = const [],
     this.level = 1,
+    required this.createdAt,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       id: map['id'] ?? '',
-      name: map['name'] ?? '',
+      name: map['name'] ?? 'User',
       email: map['email'] ?? '',
       photoUrl: map['photoUrl'],
       points: map['points'] ?? 0,
@@ -35,6 +37,7 @@ class UserModel {
       progress: Map<String, int>.from(map['progress'] ?? {}),
       badges: List<String>.from(map['badges'] ?? []),
       level: map['level'] ?? 1,
+      createdAt: map['createdAt']?.toDate() ?? DateTime.now(),
     );
   }
 
@@ -50,6 +53,7 @@ class UserModel {
       'progress': progress,
       'badges': badges,
       'level': level,
+      'createdAt': createdAt,
     };
   }
 
@@ -64,6 +68,7 @@ class UserModel {
     Map<String, int>? progress,
     List<String>? badges,
     int? level,
+    DateTime? createdAt,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -76,6 +81,7 @@ class UserModel {
       progress: progress ?? this.progress,
       badges: badges ?? this.badges,
       level: level ?? this.level,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

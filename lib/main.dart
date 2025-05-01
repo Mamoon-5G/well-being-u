@@ -8,6 +8,7 @@ import 'package:wellbeingu/providers/auth_provider.dart';
 import 'package:wellbeingu/providers/course_provider.dart';
 import 'package:wellbeingu/providers/progress_provider.dart';
 import 'package:wellbeingu/screens/auth/splash_screen.dart';
+import 'package:wellbeingu/course_upload.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
