@@ -21,11 +21,13 @@ class AuthService {
     String? name,
   }) async {
     try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print("USER" + userCredential.toString());
+
+      print(userCredential);
+      // print("user rrrrrrrrrrrrrrrrrrrrrrrrrrrr" + userCredential.toString());
       if (userCredential.user != null) {
         // Create a user document in Firestore
         final userModel = UserModel(
